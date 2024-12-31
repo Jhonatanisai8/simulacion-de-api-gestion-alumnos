@@ -5,6 +5,7 @@ import com.isai.api.gestion.alumnos.app.domain.Utils;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -64,6 +65,30 @@ public class EstudianteController {
                     return t;
                 }
                 ).orElse(null);
+    }
+
+    @PatchMapping
+    public Estudiante patchEstudiante(@RequestBody Estudiante estudiante) {
+        return this.repo.getListaEstudiantes()
+                .stream()
+                .filter((t) -> t.getIdEstudiante() == estudiante.getIdEstudiante())
+                .findFirst()
+                .map((t) -> {
+                    if (estudiante.getNombre() != null) {
+                        t.setNombre(estudiante.getNombre());
+                    }
+                    if (estudiante.getEdad() != 0) {
+                        t.setEdad(estudiante.getEdad());
+                    }
+                    if (estudiante.getCurso() != null) {
+                        t.setCurso(estudiante.getCurso());
+                    }
+                    if (estudiante.getEmail() != null) {
+                        t.setEmail(estudiante.getEmail());
+                    }
+                    return t;
+                })
+                .orElse(null);
     }
 
 }
