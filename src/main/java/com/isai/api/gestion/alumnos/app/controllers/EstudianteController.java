@@ -40,13 +40,13 @@ public class EstudianteController {
             estudianteExistente = estudianteBuscado.get();
             return ResponseEntity.ok(estudianteExistente);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente con email: " + email + " no encontrado.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Estudiante con email: " + email + " no encontrado.");
     }
 
     @PostMapping
-    public Estudiante postEstudiante(@RequestBody Estudiante estudiante) {
+    public ResponseEntity<?> postEstudiante(@RequestBody Estudiante estudiante) {
         this.repo.getListaEstudiantes().add(estudiante);
-        return estudiante;
+        return ResponseEntity.status(HttpStatus.CREATED).body("Estudiante creado correctamente: " + estudiante.getNombre());
     }
 
     @PutMapping
