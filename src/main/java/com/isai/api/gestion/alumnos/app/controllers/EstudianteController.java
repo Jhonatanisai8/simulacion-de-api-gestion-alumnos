@@ -70,16 +70,18 @@ public class EstudianteController {
     }
 
     @DeleteMapping("/{idEstudiante}")
-    public Estudiante deleteEstudiante(@PathVariable int idEstudiante) {
-        return this.repo.getListaEstudiantes()
+    public ResponseEntity<?> deleteEstudiante(@PathVariable int idEstudiante) {
+        Optional<Estudiante> estudianteBuscado = this.repo.getListaEstudiantes()
                 .stream()
                 .filter((t) -> t.getIdEstudiante() == idEstudiante)
-                .findFirst()
-                .map(t -> {
-                    this.repo.getListaEstudiantes().remove(t);
-                    return t;
-                }
-                ).orElse(null);
+                .findFirst();
+        if (estudianteBuscado.isPresent()) {
+            this.repo.getListaEstudiantes().remove(estudianteBuscado.get());
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body("Estudiante eliminado correctamente: " + idEstudiante);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Estudiante no encontrado con ID: " + idEstudiante);
     }
 
     @PatchMapping
