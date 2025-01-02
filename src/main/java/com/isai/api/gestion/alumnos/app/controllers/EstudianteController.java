@@ -3,6 +3,9 @@ package com.isai.api.gestion.alumnos.app.controllers;
 import com.isai.api.gestion.alumnos.app.domain.Estudiante;
 import com.isai.api.gestion.alumnos.app.domain.Utils;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,17 +23,24 @@ public class EstudianteController {
     private final Utils repo = new Utils();
 
     @GetMapping
-    public List<Estudiante> getEstudiantes() {
-        return this.repo.getListaEstudiantes();
+    public ResponseEntity<List<Estudiante>> getEstudiantes() {
+        //return this.repo.getListaEstudiantes();
+        List<Estudiante> estudiantes = this.repo.getListaEstudiantes();
+        return ResponseEntity.ok(estudiantes); // se devuelve yb cuerpo de tipo list de estudiantes
     }
 
     @GetMapping("/{email}")
-    public Estudiante getCliente(@PathVariable String email) {
-        return this.repo.getListaEstudiantes()
+    public ResponseEntity<?> getCliente(@PathVariable String email) {
+        Estudiante estudianteExistente = null;
+        Optional<Estudiante> estudianteBuscado = this.repo.getListaEstudiantes()
                 .stream()
                 .filter((t) -> t.getEmail().equalsIgnoreCase(email))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
+        if (estudianteBuscado.isPresent()) {
+            estudianteExistente = estudianteBuscado.get();
+            return ResponseEntity.ok(estudianteExistente);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente con email: " + email + " no encontrado.");
     }
 
     @PostMapping
