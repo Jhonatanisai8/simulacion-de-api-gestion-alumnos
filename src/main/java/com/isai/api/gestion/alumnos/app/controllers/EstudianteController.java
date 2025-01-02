@@ -85,27 +85,32 @@ public class EstudianteController {
     }
 
     @PatchMapping
-    public Estudiante patchEstudiante(@RequestBody Estudiante estudiante) {
-        return this.repo.getListaEstudiantes()
+    public ResponseEntity<?> patchEstudiante(@RequestBody Estudiante estudiante) {
+        Optional<Estudiante> estudianteBuscado = this.repo.getListaEstudiantes()
                 .stream()
                 .filter((t) -> t.getIdEstudiante() == estudiante.getIdEstudiante())
-                .findFirst()
-                .map((t) -> {
-                    if (estudiante.getNombre() != null) {
-                        t.setNombre(estudiante.getNombre());
-                    }
-                    if (estudiante.getEdad() != 0) {
-                        t.setEdad(estudiante.getEdad());
-                    }
-                    if (estudiante.getCurso() != null) {
-                        t.setCurso(estudiante.getCurso());
-                    }
-                    if (estudiante.getEmail() != null) {
-                        t.setEmail(estudiante.getEmail());
-                    }
-                    return t;
-                })
-                .orElse(null);
+                .findFirst();
+
+        if (estudianteBuscado.isPresent()) {
+            Estudiante estudianteExistente = estudianteBuscado.get();
+            if (estudiante.getNombre() != null) {
+                estudianteExistente.setNombre(estudiante.getNombre());
+            }
+            if (estudiante.getEdad() != 0) {
+                estudianteExistente.setEdad(estudiante.getEdad());
+            }
+            if (estudiante.getCurso() != null) {
+                estudianteExistente.setCurso(estudiante.getCurso());
+            }
+            if (estudiante.getEmail() != null) {
+                estudianteExistente.setEmail(estudiante.getEmail());
+            }
+            return ResponseEntity.ok("Estudiante modicado correctamte: " + estudiante.getIdEstudiante());
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Estudiante no encontrado: " + estudiante.getIdEstudiante());
+
     }
 
 }
