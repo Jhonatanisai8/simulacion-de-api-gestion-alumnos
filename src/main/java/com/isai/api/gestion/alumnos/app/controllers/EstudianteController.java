@@ -50,18 +50,23 @@ public class EstudianteController {
     }
 
     @PutMapping
-    public Estudiante putEstudiante(@RequestBody Estudiante estudiante) {
-        return this.repo.getListaEstudiantes()
+    public ResponseEntity<?> putEstudiante(@RequestBody Estudiante estudiante) {
+        Optional<Estudiante> estudianteBuscado = this.repo.getListaEstudiantes()
                 .stream()
                 .filter((t) -> t.getIdEstudiante() == estudiante.getIdEstudiante())
-                .findFirst()
-                .map((t) -> {
-                    t.setNombre(estudiante.getNombre());
-                    t.setEdad(estudiante.getEdad());
-                    t.setEmail(estudiante.getEmail());
-                    t.setCurso(estudiante.getCurso());
-                    return t;
-                }).orElse(null);
+                .findFirst();
+        if (!estudianteBuscado.isEmpty()) {
+            Estudiante estudianteExistente = estudianteBuscado.get();
+            //modificamos sus atributos
+            estudianteExistente.setNombre(estudiante.getNombre());
+            estudianteExistente.setEdad(estudiante.getEdad());
+            estudianteExistente.setEmail(estudiante.getEmail());
+            estudianteExistente.setCurso(estudiante.getCurso());
+            return ResponseEntity.ok("Estudiante modificado correctamente: " + estudiante.getIdEstudiante());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("No se encontro estudiante con dicho ID: " + estudiante.getIdEstudiante());
+
     }
 
     @DeleteMapping("/{idEstudiante}")
